@@ -1,6 +1,6 @@
-const re = /\d+(?:-\w*)*/gi;
+const re = /scp[-_ ]*\d+(?:[-_]*\w*){0,1}/gi;
 
-module.exports = input => {
+module.exports = (input) => {
 	let res = input.match(re);
 	return res;
 };

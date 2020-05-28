@@ -1,18 +1,20 @@
-const Discord = require('discord.js');
-const client = new Discord.Client();
+require('dotenv').config();
+
+const { Client, MessageEmbed } = require('discord.js');
+const client = new Client();
 
 const findScps = require('./modules/find.js');
-const scrapeScps = require('./modules/scrape.js');
+const { scps } = require('./modules/scrape.js');
 
 client.once('ready', () => {
 	console.log('Ready!');
 });
 
-client.on('message', message => {
+client.on('message', (message) => {
 	let scps = findScps(message.content);
 	if (scps) {
-		scrapeScps(scps).then(c => {
-			const embed = new Discord.MessageEmbed()
+		scps(scps).then((c) => {
+			const embed = new MessageEmbed()
 				.setColor('#c71f1f')
 				.setDescription(c.join('\n'));
 			message.channel.send(embed);
@@ -20,4 +22,4 @@ client.on('message', message => {
 	}
 });
 
-client.login('Njk5MTY3OTA3MjU0NTAxNDU3.XpZRAw.r2dBQxL71svBd-oePIY-5SPynxk');
+client.login(process.env.DISCORD_TOKEN);

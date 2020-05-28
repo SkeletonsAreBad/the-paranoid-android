@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-module.exports = async input => {
+module.exports.scps = async (input) => {
 	try {
 		let scps = [];
 
