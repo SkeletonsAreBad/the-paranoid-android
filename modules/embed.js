@@ -11,3 +11,9 @@ module.exports.embedArticle = (data) => {
 			'http://www.scp-wiki.net/local--files/component:theme/logo.png'
 		);
 };
+
+module.exports.embedInline = (input) => {
+	return new MessageEmbed()
+		.setColor(process.env.EMBED_COLOR)
+		.setDescription(input);
+};

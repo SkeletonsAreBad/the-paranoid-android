@@ -1,7 +1,7 @@
 const cheerio = require('cheerio');
 const fetch = require('node-fetch');
 
-module.exports.scrapeScp = async (input) => {
+scrapeScp = async (input) => {
 	let scp = {};
 
 	const number = input.split('-')[1];
@@ -35,9 +35,19 @@ module.exports.scrapeScp = async (input) => {
 		scp.seriesUrl = 'http://www.scp-wiki.net/scp-series';
 	} else return null;
 
-	scp.item = input;
+	const res = await fetch(scp.seriesUrl);
 
-	console.log(data);
+	const html = await res.text();
+	const $ = cheerio.load(html);
+
+	const listing = $(`.series ul li a:contains(${input})`);
+
+	scp.item = listing.text();
+	scp.slug = listing.attr().href;
+	scp.title = listing
+		.parent()
+		.text()
+		.slice(scp.item.length + 3);
 
 	return scp;
 };
@@ -87,4 +97,20 @@ module.exports.scrapeArticle = async (input) => {
 		.text()}`;
 
 	return article;
+};
+
+module.exports.scrapeScps = async (input) => {
+	let scpList = [];
+
+	for (var i = 0; i < input.length; i++) {
+		const scp = input[i];
+
+		const scpItem = await scrapeScp(scp);
+
+		scpList.push(
+			`[${scpItem.series}](${scpItem.seriesUrl}) » [${scpItem.item}](http://scp-wiki.net${scpItem.slug}) - ${scpItem.title}`
+		);
+	}
+
+	return scpList;
 };

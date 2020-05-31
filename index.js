@@ -2,7 +2,9 @@ require('dotenv').config();
 
 const { DISCORD_TOKEN, COMMAND_PREFIX } = process.env;
 
-const findScp = require('./modules/find');
+const { embedInline } = require('./modules/embed');
+const findScps = require('./modules/find');
+const { scrapeScps } = require('./modules/scrape');
 
 const fs = require('fs');
 
@@ -27,8 +29,22 @@ client.once('ready', () => {
 });
 
 client.on('message', (message) => {
-	if (!message.content.startsWith(COMMAND_PREFIX) || message.author.bot)
-		return;
+	if (message.author.bot) return;
+
+	if (!message.content.startsWith(COMMAND_PREFIX)) {
+		const scps = findScps(message.content);
+
+		if (!scps) return;
+
+		message.channel.startTyping();
+
+		scrapeScps(scps).then((scpList) => {
+			message.channel.send(embedInline(scpList));
+			message.channel.stopTyping();
+
+			return;
+		});
+	}
 
 	const args = message.content.slice(COMMAND_PREFIX.length).split(/ +/);
 	const commandName = args.shift().toLowerCase();
