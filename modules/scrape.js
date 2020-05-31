@@ -1,23 +1,5 @@
-const puppeteer = require('puppeteer');
-
-module.exports.scrapeScps = async () => {
-	const browser = await puppeteer.launch({ headless: true });
-	const page = await browser.newPage();
-
-	await page.goto('http://www.scp-wiki.net/scp-series');
-
-	await page.waitForSelector('.series', { visible: true });
-
-	const data = await page.evaluate(() => {
-		const series = document.querySelectorAll('.series')[0];
-
-		return series;
-	});
-
-	console.log(data);
-
-	await browser.close();
-};
+const cheerio = require('cheerio');
+const fetch = require('node-fetch');
 
 module.exports.scrapeScp = async (input) => {
 	let scp = {};
@@ -75,19 +57,49 @@ module.exports.scrapeScp = async (input) => {
 	return scp;
 };
 
-// module.exports.scps = async (input) => {
-// 	try {
-// 		let scps = [];
+module.exports.scrapeArticle = async (input) => {
+	let article = {};
 
-// 		for (let i = 0; i < input.length; i++) {
-// 			let scp = input[i];
-// 			await axios.get(`http://scp-wiki.net/scp-${scp}`);
-// 			scps.push(
-// 				`[SCP-${scp.toUpperCase()}](http://scp-wiki.net/scp-${scp})`
-// 			);
-// 		}
-// 		return scps;
-// 	} catch (e) {
-// 		console.error(e);
-// 	}
-// };
+	article.slug = input.toLowerCase().replace(/[- ]+/g, '-');
+
+	const res = await fetch(`http://scp-wiki.net/${article.slug}`);
+
+	const html = await res.text();
+	const $ = cheerio.load(html);
+
+	article.title = $('#page-title')
+		.first()
+		.text()
+		.replace(/[ ]+/g, ' ')
+		.replace(/\n /g, '');
+
+	let breadcrumbs = $('#breadcrumbs a').toArray();
+	let breadcrumbsarray = [];
+
+	for (var i = 0; i < breadcrumbs.length; i++) {
+		breadcrumbsarray.push(
+			`[${breadcrumbs[i].children[0].data}](http://scp-wiki.net${breadcrumbs[i].attribs.href})`
+		);
+	}
+
+	article.breadcrumbs = breadcrumbsarray.join(' » ');
+
+	if ($('#page-content p').first().text().startsWith('Item #:')) {
+		article.preview = `**Object Class:** ${
+			$('#page-content p').toArray()[1].children[1].data
+		}`;
+	} else {
+		article.preview = `${$('#page-content p')
+			.first()
+			.text()
+			.split(' ')
+			.slice(0, 50)
+			.join(' ')}…`;
+	}
+
+	article.pageInfo = `${$('#page-info').first().text()} | ${$('.rate-points')
+		.first()
+		.text()}`;
+
+	return article;
+};
