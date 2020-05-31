@@ -1,24 +1,24 @@
 {
-  "name": "the-paranoid-android",
-  "version": "1.0.0",
-  "description": "A Discord bot for finding SCPs",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "discord",
-    "bot",
-    "scp"
-  ],
-  "author": "aerzzy <ollie@aerzzy.space>",
-  "license": "MIT",
-  "dependencies": {
-    "cheerio": "^1.0.0-rc.3",
-    "discord.js": "^12.2.0",
-    "dotenv": "^8.2.0",
-    "node-fetch": "^2.6.0",
-    "sequelize": "^5.21.11",
-    "sqlite3": "^4.2.0"
-  }
+	"name": "the-paranoid-android",
+	"version": "1.0.0",
+	"description": "View and share your favourite SCP items, tales, and more.",
+	"main": "index.js",
+	"scripts": {
+		"start": "node ."
+	},
+	"keywords": [
+		"discord",
+		"bot",
+		"scp"
+	],
+	"author": "aerzzy <ollie@aerzzy.space>",
+	"license": "MIT",
+	"dependencies": {
+		"cheerio": "^1.0.0-rc.3",
+		"discord.js": "^12.2.0",
+		"dotenv": "^8.2.0",
+		"node-fetch": "^2.6.0",
+		"sequelize": "^5.21.11",
+		"sqlite3": "^4.2.0"
+	}
 }
