@@ -68,18 +68,22 @@ module.exports.embedInfo = async (client) => {
 	};
 };
 
-module.exports.embedArticle = (data) => {
-	return new MessageEmbed()
-		.setColor(EMBED_COLOR)
-		.setTitle(data.title)
-		.setURL(`http://scp-wiki.net/${data.slug}`)
-		.setDescription(`${data.breadcrumbs}\n${data.preview}`)
-		.setFooter(data.pageInfo)
-		.setThumbnail(
-			'http://www.scp-wiki.net/local--files/component:theme/logo.png'
-		);
+module.exports.embedArticle = (input) => {
+	return {
+		color: EMBED_COLOR,
+		title: input.title,
+		url: `http://scp-wiki.net${input.slug}`,
+		description: `${input.breadcrumbs}\n${input.preview}`,
+		thumbnail: {
+			url:
+				'http://www.scp-wiki.net/local--files/component:theme/logo.png',
+		},
+		footer: {
+			text: input.pageInfo,
+		},
+	};
 };
 
 module.exports.embedInline = (input) => {
-	return new MessageEmbed().setColor(EMBED_COLOR).setDescription(input);
+	return { color: EMBED_COLOR, description: input };
 };

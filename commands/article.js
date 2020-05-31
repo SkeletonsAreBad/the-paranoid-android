@@ -14,7 +14,7 @@ module.exports = {
 
 		scrapeArticle(slug).then((res) => {
 			if (res) {
-				message.channel.send(embedArticle(res));
+				message.channel.send({ embed: embedArticle(res) });
 			} else {
 				message.channel.send(`\`${slug}\` is not a valid article.`);
 			}

@@ -39,7 +39,7 @@ client.on('message', (message) => {
 		message.channel.startTyping();
 
 		scrapeScps(scps).then((scpList) => {
-			message.channel.send(embedInline(scpList));
+			message.channel.send({ embed: embedInline(scpList) });
 			message.channel.stopTyping();
 
 			return;
