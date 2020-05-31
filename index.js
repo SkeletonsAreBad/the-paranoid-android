@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { DISCORD_TOKEN, COMMAND_PREFIX } = process.env;
+const { DISCORD_TOKEN, LOG_DIRECTORY, COMMAND_PREFIX } = process.env;
 
 const { embedInline } = require('./modules/embed');
 const findScps = require('./modules/find');
@@ -10,6 +10,22 @@ const fs = require('fs');
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
+
+const { createLogger, format, transports } = require('winston');
+const { combine, timestamp, printf } = format;
+const logFormat = printf(({ level, message, timestamp }) => {
+	return `${timestamp} [${level.toUpperCase()}] ${message}`;
+});
+const logger = createLogger({
+	transports: [
+		new transports.Console(),
+		new transports.File({
+			filename: `${LOG_DIRECTORY}/${Date.now().toString()}.log`,
+		}),
+	],
+	format: combine(timestamp(), logFormat),
+});
+
 client.commands = new Discord.Collection();
 
 const cooldowns = new Discord.Collection();
@@ -25,13 +41,25 @@ for (const file of commandFiles) {
 }
 
 client.once('ready', () => {
-	console.log('Ready!');
+	logger.log('info', `Ready, logged in as "${client.user.tag}"`);
+
+	client.user.setActivity('the SCP Wiki | ./help', {
+		type: 'WATCHING',
+	});
 });
+
+client.on('debug', (m) => logger.log('debug', m));
+client.on('warn', (m) => logger.log('warn', m));
+client.on('error', (m) => logger.log('error', m));
+process.on('uncaughtException', (error) => logger.log('error', error));
 
 client.on('message', (message) => {
 	if (message.author.bot) return;
 
 	if (!message.content.startsWith(COMMAND_PREFIX)) {
+		if (message.content === `<@!${client.user.id}>`)
+			return client.commands.get('info').execute(message, []);
+
 		const scps = findScps(message.content);
 
 		if (!scps) return;
@@ -42,6 +70,19 @@ client.on('message', (message) => {
 			message.channel.send({ embed: embedInline(scpList) });
 			message.channel.stopTyping();
 
+			if (message.channel.type == 'text') {
+				logger.log(
+					'info',
+					`${message.author.id} scraped "${scps.join(', ')}" in ${
+						message.guild.id
+					}/${message.channel.id}`
+				);
+			} else {
+				logger.log(
+					'info',
+					`${message.author.id} scraped "${scps.join(', ')}" in DM`
+				);
+			}
 			return;
 		});
 	}
@@ -93,8 +134,19 @@ client.on('message', (message) => {
 
 	try {
 		command.execute(message, args);
+		if (message.channel.type == 'text') {
+			logger.log(
+				'info',
+				`${message.author.id} executed "${COMMAND_PREFIX}${commandName} ${args}" in ${message.guild.id}/${message.channel.id}`
+			);
+		} else {
+			logger.log(
+				'info',
+				`${message.author.id} executed "${COMMAND_PREFIX}${commandName} ${args}" in DM`
+			);
+		}
 	} catch (error) {
-		console.error(error);
+		logger.log('error', error);
 	}
 });
 
