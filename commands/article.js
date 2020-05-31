@@ -3,9 +3,9 @@ const { scrapeArticle } = require('../modules/scrape');
 
 module.exports = {
 	name: 'article',
-	description: 'Get information about an article from the SCP Wiki',
+	description: 'Get information about an article from the SCP Wiki.',
 	args: true,
-	usage: '[slug]',
+	usage: '[title]',
 	cooldown: 5,
 	execute(message, args) {
 		message.channel.startTyping();
