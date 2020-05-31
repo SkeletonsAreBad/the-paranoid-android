@@ -72,7 +72,7 @@ module.exports.embedArticle = (input) => {
 	return {
 		color: EMBED_COLOR,
 		title: input.title,
-		url: `http://scp-wiki.net${input.slug}`,
+		url: `http://scp-wiki.net/${input.slug}`,
 		description: `${input.breadcrumbs}\n${input.preview}`,
 		thumbnail: {
 			url:
@@ -85,5 +85,5 @@ module.exports.embedArticle = (input) => {
 };
 
 module.exports.embedInline = (input) => {
-	return { color: EMBED_COLOR, description: input };
+	return { color: EMBED_COLOR, description: input.join('\n') };
 };
