@@ -1,6 +1,8 @@
 const cheerio = require('cheerio');
 const fetch = require('node-fetch');
 
+const EXCEPTIONS = require('../exceptions.json');
+
 scrapeScp = async (input) => {
 	let scp = {};
 
@@ -59,6 +61,8 @@ module.exports.scrapeArticle = async (input) => {
 
 	const res = await fetch(`http://scp-wiki.net/${article.slug}`);
 
+	if (!res.ok) return null;
+
 	const html = await res.text();
 	const $ = cheerio.load(html);
 
@@ -79,10 +83,21 @@ module.exports.scrapeArticle = async (input) => {
 
 	article.breadcrumbs = breadcrumbsarray.join(' » ');
 
-	if ($('#page-content p').first().text().startsWith('Item #:')) {
-		article.preview = `**Object Class:** ${
-			$('#page-content p').toArray()[1].children[1].data
-		}`;
+	if (
+		$('#page-content p:contains("Object Class")') &&
+		!EXCEPTIONS.includes(article.title)
+	) {
+		article.preview = `**Object Class:** ${$(
+			'#page-content p:contains("Object Class")'
+		)
+			.text()
+			.slice(14)}\n**Description:** ${$(
+			'#page-content p:contains("Description")'
+		)
+			.text()
+			.split(' ')
+			.slice(1, 50)
+			.join(' ')}…`;
 	} else {
 		article.preview = `${$('#page-content p')
 			.first()

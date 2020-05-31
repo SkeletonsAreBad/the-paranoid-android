@@ -13,7 +13,11 @@ module.exports = {
 		const slug = args.join(' ');
 
 		scrapeArticle(slug).then((res) => {
-			message.channel.send(embedArticle(res));
+			if (res) {
+				message.channel.send(embedArticle(res));
+			} else {
+				message.channel.send(`\`${slug}\` is not a valid article.`);
+			}
 			message.channel.stopTyping();
 		});
 	},
