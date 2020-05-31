@@ -37,21 +37,6 @@ module.exports.scrapeScp = async (input) => {
 
 	scp.item = input;
 
-	const browser = await puppeteer.launch({ headless: true });
-	const page = await browser.newPage();
-
-	await page.goto(scp.seriesUrl);
-
-	await page.waitForSelector('.series', { visible: true });
-
-	const data = await page.evaluate(() => {
-		const series = document.querySelectorAll('a')[0].src;
-
-		return series;
-	});
-
-	await page.close();
-
 	console.log(data);
 
 	return scp;

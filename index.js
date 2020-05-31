@@ -1,37 +1,85 @@
 require('dotenv').config();
 
-const { embedArticle } = require('./modules/embed');
+const { DISCORD_TOKEN, COMMAND_PREFIX } = process.env;
+
 const findScp = require('./modules/find');
-const { scrapeArticle } = require('./modules/scrape');
 
-// scrapeArticle('The Executions of Doctor Bright').then((res) => {
-// 	console.log(res);
-// });
+const fs = require('fs');
 
-const discord = require('discord.js');
-const client = new discord.Client();
+const Discord = require('discord.js');
+const client = new Discord.Client();
+client.commands = new Discord.Collection();
+
+const cooldowns = new Discord.Collection();
+
+const commandFiles = fs
+	.readdirSync('./commands')
+	.filter((file) => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+
+	client.commands.set(command.name, command);
+}
 
 client.once('ready', () => {
 	console.log('Ready!');
 });
 
 client.on('message', (message) => {
-	if (!message.content.startsWith(process.env.COMMAND_PREFIX)) return;
+	if (!message.content.startsWith(COMMAND_PREFIX) || message.author.bot)
+		return;
 
-	let args = message.content.split(' ');
-	let command = args
-		.shift()
-		.replace(process.env.COMMAND_PREFIX, '')
-		.toLowerCase();
+	const args = message.content.slice(COMMAND_PREFIX.length).split(/ +/);
+	const commandName = args.shift().toLowerCase();
 
-	if (command === 'article') {
-		message.channel.startTyping();
+	if (!client.commands.has(commandName)) return;
 
-		scrapeArticle(args.join(' ')).then((res) => {
-			message.channel.send(embedArticle(res));
-			message.channel.stopTyping();
-		});
+	const command = client.commands.get(commandName);
+
+	if (command.guildOnly && message.channel.type !== 'text')
+		return message.channel.send(
+			`${command.name} can only be used in a guild.`
+		);
+
+	if (command.args && !args.length) {
+		let reply = `Invalid arguements for ${command.name}.`;
+
+		if (command.usage)
+			reply += `\nTry \`${COMMAND_PREIFX}${command.name} ${command.usage}\``;
+
+		return message.channel.send(reply);
+	}
+
+	if (!cooldowns.has(command.name))
+		cooldowns.set(command.name, new Discord.Collection());
+
+	const now = Date.now();
+	const timestamps = cooldowns.get(command.name);
+	const cooldownAmount = (command.cooldown || 1) * 1000;
+
+	if (timestamps.has(message.author.id)) {
+		const expirationTime =
+			timestamps.get(message.author.id) + cooldownAmount;
+
+		if (now < expirationTime) {
+			const timeLeft = (expirationTime - now) / 1000;
+			return message.channel.send(
+				`Please wait ${timeLeft.toFixed(1)} seconds before using ${
+					command.name
+				} again.`
+			);
+		}
+	}
+
+	timestamps.set(message.author.id, now);
+	setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+
+	try {
+		command.execute(message, args);
+	} catch (error) {
+		console.error(error);
 	}
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(DISCORD_TOKEN);
