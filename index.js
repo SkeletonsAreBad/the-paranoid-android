@@ -16,7 +16,7 @@ const { combine, timestamp, printf } = format;
 const logFormat = printf(({ level, message, timestamp }) => {
 	return `${timestamp} [${level.toUpperCase()}] ${message}`;
 });
-const logger = createLogger({
+client.logger = createLogger({
 	transports: [
 		new transports.Console(),
 		new transports.File({
@@ -41,17 +41,30 @@ for (const file of commandFiles) {
 }
 
 client.once('ready', () => {
-	logger.log('info', `Ready, logged in as "${client.user.tag}"`);
+	client.logger.log('info', `Ready, logged in as "${client.user.tag}"`);
 
 	client.user.setActivity('the SCP Wiki | ./help', {
 		type: 'WATCHING',
 	});
 });
 
-client.on('debug', (m) => logger.log('debug', m));
-client.on('warn', (m) => logger.log('warn', m));
-client.on('error', (m) => logger.log('error', m));
-process.on('uncaughtException', (error) => logger.log('error', error));
+client.on('debug', (m) => client.logger.log('debug', m));
+client.on('warn', (m) => client.logger.log('warn', m));
+client.on('error', (m) => client.logger.log('error', m));
+process.on('uncaughtException', (error) => client.logger.log('error', error));
+
+client.on('guildCreate', (guild) => {
+	guild.me.setNickname('Marv', "Hello! It's me Marv!");
+
+	let message = `Hi, I'm ${client.user.username} (prefix \`${COMMAND_PREFIX}\`).\nI'm here to help you with viewing your favourite SCP items, tales and more. To see what I can do try \`${COMMAND_PREFIX}help\`, \`${COMMAND_PREFIX}info\`, or type <@!${client.user.id}>. I'll also keep an eye out for when you mention an SCP and try to link to it, but if you don't like that you can do \`${COMMAND_PREFIX}ignore\`.\nFor more info check https://marv.skel.cc`;
+	guild.systemChannel.send(message);
+
+	client.logger.log('info', `Joined Guild ${guild.id}`);
+});
+
+client.on('guildDelete', (guild) =>
+	client.logger.log('info', `Removed from Guild ${guild.id}`)
+);
 
 client.on('message', (message) => {
 	if (message.author.bot) return;
@@ -71,14 +84,14 @@ client.on('message', (message) => {
 			message.channel.stopTyping();
 
 			if (message.channel.type == 'text') {
-				logger.log(
+				client.logger.log(
 					'info',
 					`${message.author.id} scraped "${scps.join(', ')}" in ${
 						message.guild.id
 					}/${message.channel.id}`
 				);
 			} else {
-				logger.log(
+				client.logger.log(
 					'info',
 					`${message.author.id} scraped "${scps.join(', ')}" in DM`
 				);
@@ -135,18 +148,18 @@ client.on('message', (message) => {
 	try {
 		command.execute(message, args);
 		if (message.channel.type == 'text') {
-			logger.log(
+			client.logger.log(
 				'info',
 				`${message.author.id} executed "${COMMAND_PREFIX}${commandName} ${args}" in ${message.guild.id}/${message.channel.id}`
 			);
 		} else {
-			logger.log(
+			client.logger.log(
 				'info',
 				`${message.author.id} executed "${COMMAND_PREFIX}${commandName} ${args}" in DM`
 			);
 		}
 	} catch (error) {
-		logger.log('error', error);
+		client.logger.log('error', error);
 	}
 });
 
