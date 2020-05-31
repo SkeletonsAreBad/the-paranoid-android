@@ -1,3 +1,32 @@
+const { COMMAND_PREFIX, EMBED_COLOR } = process.env;
+
+module.exports.embedHelpCommand = (input) => {
+	return {
+		color: EMBED_COLOR,
+		title: `Help: ${input.name}`,
+		description: input.description,
+		fields: [
+			{ name: 'Usage', value: `\`${input.usage}\``, inline: true },
+			{ name: 'Cooldown', value: input.cooldown, inline: true },
+		],
+	};
+};
+
+module.exports.embedHelpFull = (input) => {
+	return {
+		color: EMBED_COLOR,
+		title: 'Help',
+		description: `Here's a list of commands that the bot can use.\nRun \`${COMMAND_PREFIX}help [command]\` for command usage.\n\n${input.commands}`,
+		fields: [
+			{
+				name: 'Support',
+				value: `For bug reports and feature suggestions join the [Support Server](${process.env.SERVER_INVITE})`,
+				inline: false,
+			},
+		],
+	};
+};
+
 module.exports.embedInfo = async (client) => {
 	const owner = await client.users.fetch('100422004812816384');
 	const guilds = await client.guilds.cache;
@@ -6,7 +35,7 @@ module.exports.embedInfo = async (client) => {
 	].replace('^', 'v');
 
 	return {
-		color: process.env.EMBED_COLOR,
+		color: EMBED_COLOR,
 		title: client.user.username,
 		url: 'https://marv.skel.cc',
 		author: {
@@ -41,7 +70,7 @@ module.exports.embedInfo = async (client) => {
 
 module.exports.embedArticle = (data) => {
 	return new MessageEmbed()
-		.setColor(process.env.EMBED_COLOR)
+		.setColor(EMBED_COLOR)
 		.setTitle(data.title)
 		.setURL(`http://scp-wiki.net/${data.slug}`)
 		.setDescription(`${data.breadcrumbs}\n${data.preview}`)
@@ -52,7 +81,5 @@ module.exports.embedArticle = (data) => {
 };
 
 module.exports.embedInline = (input) => {
-	return new MessageEmbed()
-		.setColor(process.env.EMBED_COLOR)
-		.setDescription(input);
+	return new MessageEmbed().setColor(EMBED_COLOR).setDescription(input);
 };
