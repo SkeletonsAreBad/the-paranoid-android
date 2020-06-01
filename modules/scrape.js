@@ -57,7 +57,10 @@ scrapeScp = async (input) => {
 module.exports.scrapeArticle = async (input) => {
 	let article = {};
 
-	article.slug = input.toLowerCase().replace(/[- ]+/g, '-');
+	article.slug = input
+		.toLowerCase()
+		.replace(/[-'" ]+/g, '-')
+		.replace(/[.,]+/g, '');
 
 	const res = await fetch(`http://scp-wiki.net/${article.slug}`);
 
