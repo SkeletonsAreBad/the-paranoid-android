@@ -1,6 +1,11 @@
 require('dotenv').config();
 
-const { DISCORD_TOKEN, LOG_DIRECTORY, COMMAND_PREFIX } = process.env;
+const {
+	DISCORD_TOKEN,
+	DEBUG_ENABLE,
+	LOG_DIRECTORY,
+	COMMAND_PREFIX,
+} = process.env;
 
 const { embedInline } = require('./modules/embed');
 const findScps = require('./modules/find');
@@ -16,15 +21,21 @@ const { combine, timestamp, printf } = format;
 const logFormat = printf(({ level, message, timestamp }) => {
 	return `${timestamp} [${level.toUpperCase()}] ${message}`;
 });
-client.logger = createLogger({
-	transports: [
-		new transports.Console(),
-		new transports.File({
-			filename: `${LOG_DIRECTORY}/${Date.now().toString()}.log`,
-		}),
-	],
-	format: combine(timestamp(), logFormat),
-});
+if (DEBUG_ENABLE == 'false')
+	client.logger = createLogger({
+		transports: [
+			new transports.Console(),
+			new transports.File({
+				filename: `${LOG_DIRECTORY}/${Date.now().toString()}.log`,
+			}),
+		],
+		format: combine(timestamp(), logFormat),
+	});
+else
+	client.logger = createLogger({
+		transports: [new transports.Console()],
+		format: combine(timestamp(), logFormat),
+	});
 
 client.commands = new Discord.Collection();
 
