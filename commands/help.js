@@ -24,9 +24,9 @@ module.exports = {
 					message.reply("I've sent you a DM with all my commands.");
 				})
 				.catch((err) => {
-					console.error(
-						`Could not send help DM to ${message.author.tag}.\n`,
-						error
+					message.client.logger.log(
+						'error',
+						`Could not send help DM to ${message.author.tag}.\n`
 					);
 					message.reply(
 						"It looks like I can't DM you. Do you have DMs disabled?"
