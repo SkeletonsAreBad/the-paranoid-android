@@ -129,3 +129,53 @@ module.exports.scrapeScps = async (input) => {
 
 	return scpList;
 };
+
+module.exports.scrapeMtfInfo = async (input) => {
+	let mtf = {};
+
+	const res = await fetch(`http://scp-wiki.net/task-forces`);
+
+	const html = await res.text();
+	const $ = cheerio.load(html);
+
+	const mtfInfo = $(`span:contains(${input})`).parent();
+
+	if (!mtfInfo) return null;
+
+	mtf.url = input.toLowerCase();
+
+	mtf.title = mtfInfo.text();
+
+	if (mtf.title.startsWith('MTF')) {
+		mtf.mission = mtfInfo.parent().parent().find('p').text().slice(20);
+
+		mtf.logoUrl = mtfInfo.parent().find('img').attr().src;
+	} else {
+		mtf.title = 'MTF ' + mtf.title;
+
+		mtf.mission = mtfInfo.next().text().slice(20);
+
+		mtf.logoUrl =
+			'http://www.scp-wiki.net/local--files/component:theme/logo.png';
+	}
+
+	return mtf;
+};
+
+module.exports.scrapeMtfFull = async () => {
+	let mtf = [];
+
+	const res = await fetch(`http://scp-wiki.net/task-forces`);
+
+	const html = await res.text();
+	const $ = cheerio.load(html);
+
+	$('.collapsible-block-content p a').each(function () {
+		text = $(this).text();
+		if (!text.startsWith('MTF')) text = 'MTF ' + text;
+		href = $(this).attr('href');
+		if (href.match(/\w+-\d+/gi)) mtf.push(`• ${text}`);
+	});
+
+	return mtf;
+};

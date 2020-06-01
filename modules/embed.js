@@ -87,3 +87,42 @@ module.exports.embedArticle = (input) => {
 module.exports.embedInline = (input) => {
 	return { color: EMBED_COLOR, description: input.join('\n') };
 };
+
+module.exports.embedMtfInfo = (input) => {
+	return {
+		color: EMBED_COLOR,
+		title: input.title,
+		url: `http://scp-wiki.net/task-forces#${input.url}`,
+		description: `**Task Force Mission:** ${input.mission}`,
+		thumbnail: {
+			url: input.logoUrl,
+		},
+	};
+};
+
+module.exports.embedMtfFull = (input) => {
+	const half = Math.floor(input.length / 2);
+
+	return {
+		color: EMBED_COLOR,
+		title: 'Mobile Task Forces',
+		url: 'http://scp-wiki.net/task-forces',
+		description:
+			'Mobile Task Forces (MTFs) are elite units comprised of personnel drawn from across the Foundation and are mobilized to deal with specific threats or situations that sometimes exceed the operational capacity or expertise of regular field personnel and — as their name suggests — may be relocated between facilities or locations as they are needed. Mobile Task Force personnel represent the "best of the best" of the Foundation.',
+		fields: [
+			{
+				name: 'Task Forces (1/2)',
+				value: input.slice(0, half),
+				inline: true,
+			},
+			{
+				name: 'Task Forces (2/2)',
+				value: input.slice(half, input.length),
+				inline: true,
+			},
+		],
+		footer: {
+			text: 'For MTF info run: ./mtf [code]',
+		},
+	};
+};
