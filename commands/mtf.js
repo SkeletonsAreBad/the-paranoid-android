@@ -37,7 +37,7 @@ module.exports = {
 					.catch((err) => {
 						message.client.logger.log(
 							'error',
-							`Could not send an MTF DM to ${message.author.id}.`
+							`Could not send an MTF DM to ${message.author.id}`
 						);
 						message.reply(
 							"It looks like I can't DM you. Do you have DMs disabled?"
