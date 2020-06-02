@@ -133,6 +133,24 @@ module.exports.scrapeScps = async (input) => {
 	return scpList;
 };
 
+module.exports.scrape001 = async () => {
+	let proposals = [];
+
+	const res = await fetch(`http://scp-wiki.net/scp-001`);
+
+	const html = await res.text();
+	const $ = cheerio.load(html);
+
+	$('.series p a').each(function () {
+		codename = $(this).text();
+		href = $(this).attr('href');
+		title = $(this).parent().text().slice(codename.length);
+		proposals.push(`[${codename}](http://scp-wiki.net${href})${title}`);
+	});
+
+	return proposals;
+};
+
 module.exports.scrapeMtfInfo = async (input) => {
 	let mtf = {};
 

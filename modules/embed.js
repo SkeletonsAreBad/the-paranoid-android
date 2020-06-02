@@ -88,6 +88,35 @@ module.exports.embedInline = (input) => {
 	return { color: EMBED_COLOR, description: input.join('\n') };
 };
 
+module.exports.embed001 = (input) => {
+	const half = Math.floor(input.length / 2);
+
+	return [
+		{
+			color: EMBED_COLOR,
+			title:
+				'THE FOLLOWING FILES HAVE BEEN CLASSIFIED TOP SECRET BY ORDER OF THE ADMINISTRATOR',
+			url: 'http://scp-wiki.net/scp-001',
+			description:
+				'**GENERAL NOTICE 001-Alpha:** In order to prevent knowledge of SCP-001 from being leaked, several/no false SCP-001 files have been created alongside the true file/files. All files concerning the nature of SCP-001, including the decoy/decoys, are protected by a memetic kill agent designed to immediately cause cardiac arrest in any nonauthorized personnel attempting to access the file. Revealing the true nature/natures of SCP-001 to the general public is cause for execution, except as required under ████-███-██████.\n\n**WARNING:**\nANY NON-AUTHORIZED PERSONNEL ACCESSING THIS FILE WILL BE IMMEDIATELY TERMINATED THROUGH **BERRYMAN-LANGFORD** MEMETIC KILL AGENT. SCROLLING DOWN WITHOUT PROPER MEMETIC INOCULATION WILL RESULT IN IMMEDIATE CARDIAC ARREST FOLLOWED BY DEATH.\n**YOU HAVE BEEN WARNED.**',
+			image: {
+				url:
+					'http://scp-wiki.wdfiles.com/local--resized-images/scp-001/fractal001/medium.jpg',
+			},
+		},
+		{
+			color: EMBED_COLOR,
+			description: `**MEMETIC KILL AGENT ACTIVATED\nCONTINUED LIFE SIGNS CONFIRMED\nREMOVING SAFETY INTERLOCKS**\nWelcome, authorized personnel. Please select your desired file.\n\n ${input
+				.slice(0, half)
+				.join('\n')}`,
+		},
+		{
+			color: EMBED_COLOR,
+			description: input.slice(half, input.length).join('\n'),
+		},
+	];
+};
+
 module.exports.embedMtfInfo = (input) => {
 	return {
 		color: EMBED_COLOR,
