@@ -200,3 +200,49 @@ module.exports.scrapeMtfFull = async () => {
 
 	return mtf;
 };
+
+module.exports.scrapeGoiInfo = async (input) => {
+	let goi = {};
+
+	const res = await fetch(`http://www.scp-wiki.net/groups-of-interest`);
+
+	const html = await res.text();
+	const $ = cheerio.load(html);
+
+	const goiInfo = $(`h1:contains(${input})`);
+
+	if (!goiInfo) return null;
+
+	goi.url = goiInfo.children().children().attr('href');
+
+	if (goi.url.startsWith('/')) goi.url = 'http://www.scp-wiki.net' + goi.url;
+
+	goi.title = goiInfo.text();
+
+	goi.overview = [];
+
+	goi.overview = goiInfo.parent().find('p').first().text().slice(10);
+
+	if (goi.overview.length > 2000)
+		goi.overview = goi.overview.slice(0, 2000) + '…';
+
+	goi.logoUrl = goiInfo.parent().find('img').attr().src;
+
+	return goi;
+};
+
+module.exports.scrapeGoiFull = async () => {
+	let goi = [];
+
+	const res = await fetch(`http://scp-wiki.net/groups-of-interest`);
+
+	const html = await res.text();
+	const $ = cheerio.load(html);
+
+	$('#toc-list div a').each(function () {
+		text = $(this).text();
+		goi.push(`• ${text}`);
+	});
+
+	return goi;
+};

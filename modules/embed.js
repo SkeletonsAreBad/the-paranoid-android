@@ -155,3 +155,42 @@ module.exports.embedMtfFull = (input) => {
 		},
 	};
 };
+
+module.exports.embedGoiInfo = (input) => {
+	return {
+		color: EMBED_COLOR,
+		title: input.title,
+		url: input.url,
+		description: `**Overview:** ${input.overview}`,
+		thumbnail: {
+			url: input.logoUrl,
+		},
+	};
+};
+
+module.exports.embedGoiFull = (input) => {
+	const half = Math.floor(input.length / 2);
+
+	return {
+		color: EMBED_COLOR,
+		title: 'Groups Of Interest',
+		url: 'http://scp-wiki.net/groups-of-interest',
+		description:
+			'The Foundation is not the only group with an interest and investment in the paranormal and metaphysical. There are many other groups in existence who possess, use, or attempt to create SCP objects, either for their own personal gain or for the protection of mankind. Some are rival organizations, some are splinter groups of the Foundation, and some are trusted associates of the Foundation. In any case, it has been deemed necessary to create and distribute a brief on what agencies the Foundation knows about, and our stance towards them.',
+		fields: [
+			{
+				name: 'Groups (1/2)',
+				value: input.slice(0, half),
+				inline: true,
+			},
+			{
+				name: 'Groups (2/2)',
+				value: input.slice(half, input.length),
+				inline: true,
+			},
+		],
+		footer: {
+			text: 'For GOI info run: ./goi [name]',
+		},
+	};
+};
