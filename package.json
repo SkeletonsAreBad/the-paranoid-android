@@ -12,7 +12,7 @@
 		"scp"
 	],
 	"author": "SkeletonsAreBad <ok@skel.cc>",
-	"license": "MIT",
+	"license": "GPL-3.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/SkeletonsAreBad/the-paranoid-android.git"
