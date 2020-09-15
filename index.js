@@ -67,7 +67,7 @@ process.on('uncaughtException', (error) => client.logger.log('error', error));
 client.on('guildCreate', (guild) => {
 	guild.me.setNickname('Marv', "Hello! It's me Marv!");
 
-	let message = `Hi, I'm ${client.user.username} (prefix \`${COMMAND_PREFIX}\`).\nI'm here to help you with viewing your favourite SCP items, tales and more. To see what I can do try \`${COMMAND_PREFIX}help\`, \`${COMMAND_PREFIX}info\`, or type <@!${client.user.id}>. I'll also keep an eye out for when you mention an SCP and try to link to it, but if you don't like that you can do \`${COMMAND_PREFIX}ignore\`.\nFor more info check https://marv.skel.cc`;
+	let message = `Hi, I'm ${client.user.username} (prefix \`${COMMAND_PREFIX}\`).\nI'm here to help you with viewing your favourite SCP items, tales and more. To see what I can do try \`${COMMAND_PREFIX}help\`, \`${COMMAND_PREFIX}info\`, or type <@!${client.user.id}>. I'll also keep an eye out for when you mention an SCP and try to link to it, but if you don't like that you can do \`${COMMAND_PREFIX}ignore\`.\nFor more info check https://skel.cc/p/the-paranoid-android.`;
 	guild.systemChannel.send(message);
 
 	client.logger.log('info', `Joined Guild ${guild.id}`);
@@ -97,8 +97,7 @@ client.on('message', (message) => {
 			if (message.channel.type == 'text') {
 				client.logger.log(
 					'info',
-					`${message.author.id} scraped "${scps.join(', ')}" in ${
-						message.guild.id
+					`${message.author.id} scraped "${scps.join(', ')}" in ${message.guild.id
 					}/${message.channel.id}`
 				);
 			} else {
@@ -146,8 +145,7 @@ client.on('message', (message) => {
 		if (now < expirationTime) {
 			const timeLeft = (expirationTime - now) / 1000;
 			return message.channel.send(
-				`Please wait ${timeLeft.toFixed(1)} seconds before using ${
-					command.name
+				`Please wait ${timeLeft.toFixed(1)} seconds before using ${command.name
 				} again.`
 			);
 		}

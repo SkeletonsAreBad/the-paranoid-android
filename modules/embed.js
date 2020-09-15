@@ -37,7 +37,7 @@ module.exports.embedInfo = async (client) => {
 	return {
 		color: EMBED_COLOR,
 		title: client.user.username,
-		url: 'https://marv.skel.cc',
+		url: 'https://skel.cc/p/the-paranoid-android',
 		author: {
 			name: owner.tag,
 			icon_url: owner.avatarURL(),
